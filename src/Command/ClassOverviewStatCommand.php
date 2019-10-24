@@ -25,7 +25,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class ClassOverviewStatCommand extends Command
 {
     /**
-     * @author Feday2 <feday2@gmail.com>
+     * @param void
      */
     protected function configure(): void
     {
@@ -41,21 +41,23 @@ final class ClassOverviewStatCommand extends Command
     }
 
     /**
-     * @author Feday2 <feday2@gmail.com>
+     * @param InputInterface  $input
+     * @param OutputInterface $output
      */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        
         $className = $input->getArgument('name');
         $analyzer = new ClassOverviewAnalyzer($className);
         $resultCount = $analyzer->analyze();
         $classType = $analyzer->getClassType();
 
-        $output->writeln('Class: '.$className.' is '.$classType);
-        foreach ($resultCount as $rootElName => $counts ) {
-            $output->writeln($rootElName.':');
-            foreach ($counts as $name => $count ) {
-                $output->writeln('    '.$name.': '.$count);
+        $output->writeln('Class: ' . $className . ' is ' . $classType);
+
+        foreach ($resultCount as $rootElName => $counts) {
+            $output->writeln($rootElName . ':');
+
+            foreach ($counts as $name => $count) {
+                $output->writeln('    ' . $name . ': ' . $count);
             }
         }
     }

@@ -2,22 +2,36 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the "PHP Static Analyzer" project.
+ *
+ * (c) Vladimir Kuprienko <vldmr.kuprienko@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Greeflas\StaticAnalyzer\Analyzer;
 
 use Greeflas\StaticAnalyzer\Exception\ClassNotExistException;
 
+/**
+ * @author Feday2 <feday2@gmail.com>
+ */
 final class ClassOverviewAnalyzer
 {
-
     private $className;
     private $reflect;
-    CONST VISIBILITIES = [
+    private const VISIBILITIES = [
         'PUBLIC',
         'PRIVATE',
-        'PROTECTED'
+        'PROTECTED',
     ];
     private $resultCount = [];
 
+    /**
+     * @param string $className
+     */
     public function __construct(string $className)
     {
         $this->isClassExist($className);
@@ -25,46 +39,65 @@ final class ClassOverviewAnalyzer
         $this->reflect = new \ReflectionClass($className);
     }
 
-    private function isClassExist($className)
+    /**
+     * @param string $className
+     */
+    private function isClassExist(string $className): void
     {
-        if (!class_exists($className)) {
-            throw new ClassNotExistException('Class '.$className.' not exist');
+        if (!\class_exists($className)) {
+            throw new ClassNotExistException('Class ' . $className . ' not exist');
         }
     }
 
-    private function calculate (array $elements) {
+    /**
+     * @param array $elements
+     *
+     * @return int
+     */
+    private function calculate(array $elements): int
+    {
         $count = 0;
+
         foreach ($elements as $el) {
             if ($el->class === $this->className) {
-                $count++;
+                ++$count;
             }
         }
+
         return $count;
     }
 
-    public function analyze()
+    /**
+     * @return array
+     */
+    public function analyze(): array
     {
         foreach (self::VISIBILITIES as $visibility) {
-            $isVisibility = 'IS_'.$visibility;
+            $isVisibility = 'IS_' . $visibility;
 
-            $methodCount = $this->calculate($this->reflect->getMethods(constant('\ReflectionMethod::'. $isVisibility)));
+            $methodCount = $this->calculate($this->reflect->getMethods(\constant('\ReflectionMethod::' . $isVisibility)));
             $this->resultCount['Methods'][$visibility] = $methodCount;
 
-            $propCount = $this->calculate($this->reflect->getProperties(constant('\ReflectionMethod::'. $isVisibility)));
+            $propCount = $this->calculate($this->reflect->getProperties(\constant('\ReflectionMethod::' . $isVisibility)));
             $this->resultCount['Properties'][$visibility] = $propCount;
         }
+
         return $this->resultCount;
     }
 
-    public function getClassType()
+    /**
+     * @return string
+     */
+    public function getClassType(): string
     {
-        if ($this->reflect->isFinal()){
+        if ($this->reflect->isFinal()) {
             return 'final';
         }
-        if ($this->reflect->isAbstract()){
+
+        if ($this->reflect->isAbstract()) {
             return 'abstruct';
         }
+
         return 'normal';
     }
-
 }

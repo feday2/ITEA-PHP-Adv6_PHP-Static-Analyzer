@@ -16,6 +16,7 @@ Usage
 -----
 
 `$ ./bin/console stat:class-author <src> <email>` - Shows quantity of classes/interfaces/traits created by some developer.
+`$ ./bin/console stat:class:overview <name>` - Shows count of methods/properties of class.
 
 License
 -------
