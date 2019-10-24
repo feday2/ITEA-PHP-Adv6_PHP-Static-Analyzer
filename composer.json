@@ -8,6 +8,11 @@
       "name": "Vladimir Kuprienko",
       "email": "vldmr.kuprienko@gmail.com",
       "role": "Maintainer"
+    },
+    {
+      "name": "feday2",
+      "email": "feday2@gmail.com",
+      "role": "student"
     }
   ],
   "minimum-stability": "stable",
