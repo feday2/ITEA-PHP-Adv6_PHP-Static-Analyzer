@@ -13,91 +13,61 @@ declare(strict_types=1);
 
 namespace Greeflas\StaticAnalyzer\Analyzer;
 
-use Greeflas\StaticAnalyzer\Exception\ClassNotExistException;
+use Greeflas\StaticAnalyzer\Collection\ClassStatisticCollection;
 
 /**
  * @author Feday2 <feday2@gmail.com>
  */
-final class ClassOverviewAnalyzer
+class ClassOverviewAnalyzer
 {
+    private const VISIBILITIES = [
+        'public',
+        'private',
+        'protected',
+    ];
     private $className;
     private $reflect;
-    private const VISIBILITIES = [
-        'PUBLIC',
-        'PRIVATE',
-        'PROTECTED',
-    ];
-    private $resultCount = [];
+    private $statCollection;
 
     /**
      * @param string $className
      */
     public function __construct(string $className)
     {
-        $this->isClassExist($className);
         $this->className = $className;
         $this->reflect = new \ReflectionClass($className);
+        $this->statCollection = new ClassStatisticCollection($this->reflect);
     }
 
     /**
-     * @param string $className
-     */
-    private function isClassExist(string $className): void
-    {
-        if (!\class_exists($className)) {
-            throw new ClassNotExistException('Class ' . $className . ' not exist');
-        }
-    }
-
-    /**
-     * @param array $elements
+     * @param array  $elements
+     * @param string $classEl
+     * @param string $visibility
      *
      * @return int
      */
-    private function calculate(array $elements): int
+    private function calculate(array $elements, string $classEl, string $visibility): void
     {
-        $count = 0;
-
         foreach ($elements as $el) {
             if ($el->class === $this->className) {
-                ++$count;
+                $this->statCollection->updateVisibilityCount($classEl, $visibility);
             }
         }
-
-        return $count;
     }
 
     /**
-     * @return array
+     * @return ClassStatisticCollection
      */
-    public function analyze(): array
+    public function analyze(): ClassStatisticCollection
     {
         foreach (self::VISIBILITIES as $visibility) {
-            $isVisibility = 'IS_' . $visibility;
-
-            $methodCount = $this->calculate($this->reflect->getMethods(\constant('\ReflectionMethod::' . $isVisibility)));
-            $this->resultCount['Methods'][$visibility] = $methodCount;
-
-            $propCount = $this->calculate($this->reflect->getProperties(\constant('\ReflectionMethod::' . $isVisibility)));
-            $this->resultCount['Properties'][$visibility] = $propCount;
+            $isVisibility = 'IS_' . \strtoupper($visibility);
+            $methods = $this->reflect->getMethods(\constant('\ReflectionMethod::' . $isVisibility));
+            $properties = $this->reflect->getProperties(\constant('\ReflectionMethod::' . $isVisibility));
+            $this->calculate($methods, 'method', $visibility);
+            $this->calculate($properties, 'property', $visibility);
         }
 
-        return $this->resultCount;
-    }
-
-    /**
-     * @return string
-     */
-    public function getClassType(): string
-    {
-        if ($this->reflect->isFinal()) {
-            return 'final';
-        }
-
-        if ($this->reflect->isAbstract()) {
-            return 'abstruct';
-        }
-
-        return 'normal';
+        return $this->statCollection;
     }
 }

@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @author Feday2 <feday2@gmail.com>
  */
-final class ClassOverviewStatCommand extends Command
+class ClassOverviewStatCommand extends Command
 {
     /**
      * @param void
@@ -48,17 +48,7 @@ final class ClassOverviewStatCommand extends Command
     {
         $className = $input->getArgument('name');
         $analyzer = new ClassOverviewAnalyzer($className);
-        $resultCount = $analyzer->analyze();
-        $classType = $analyzer->getClassType();
-
-        $output->writeln('Class: ' . $className . ' is ' . $classType);
-
-        foreach ($resultCount as $rootElName => $counts) {
-            $output->writeln($rootElName . ':');
-
-            foreach ($counts as $name => $count) {
-                $output->writeln('    ' . $name . ': ' . $count);
-            }
-        }
+        $result = $analyzer->analyze();
+        $output->writeln($result->toConsoleOutput());
     }
 }

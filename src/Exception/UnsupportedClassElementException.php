@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace Greeflas\StaticAnalyzer\Exception;
 
-class ClassNotExistException extends \Exception
+/**
+ * @author Feday2 <feday2@gmail.com>
+ */
+class UnsupportedClassElementException extends \Exception
 {
 }
