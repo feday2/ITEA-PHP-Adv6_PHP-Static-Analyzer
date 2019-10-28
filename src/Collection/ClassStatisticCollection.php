@@ -58,9 +58,9 @@ class ClassStatisticCollection
         if ($this->class->isFinal()) {
             $this->classType = 'final';
         } elseif ($this->class->isAbstract()) {
-            $this->classType = 'final';
+            $this->classType = 'abstruct';
         } else {
-            $this->classType = 'final';
+            $this->classType = 'normal';
         }
     }
 
